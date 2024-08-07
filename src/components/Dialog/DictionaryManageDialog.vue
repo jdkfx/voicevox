@@ -112,7 +112,7 @@
 
           <!-- 右側のpane -->
           <div
-            v-if="wordEditing"
+            v-show="wordEditing"
             class="col-8 no-wrap text-no-wrap word-editor"
           >
             <div class="row q-pl-md q-mt-md">
@@ -286,7 +286,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import { QInput } from "quasar";
 import AudioAccent from "@/components/Talk/AudioAccent.vue";
 import ContextMenu from "@/components/Menu/ContextMenu.vue";
@@ -701,6 +701,13 @@ const {
   startContextMenuOperation: startSurfaceContextMenuOperation,
   endContextMenuOperation: endSurfaceContextMenuOperation,
 } = useRightClickContextMenu(surfaceInput, surface, ref("surface"));
+
+watchEffect(() => {
+  console.log(
+    "surfaceInput.value?.getNativeElement",
+    surfaceInput.value?.getNativeElement(),
+  );
+});
 
 const {
   contextMenu: yomiContextMenu,

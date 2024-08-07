@@ -17,6 +17,7 @@ export function useRightClickContextMenu(
   inputText: Ref<string>,
   inputField: Ref<string>,
 ) {
+  console.log(`useRightClickContextMenu qInputRef.value`, qInputRef.value);
   const inputSelection = new SelectionHelperForQInput(qInputRef);
 
   /**
@@ -29,6 +30,8 @@ export function useRightClickContextMenu(
 
   const contextMenuHeader = ref<string | undefined>("");
   const readyForContextMenu = () => {
+    console.log(`readyForContextMenu inputSelection`, inputSelection);
+
     const MAX_HEADER_LENGTH = 15;
     const SHORTED_HEADER_FRAGMENT_LENGTH = 5;
 
@@ -40,6 +43,7 @@ export function useRightClickContextMenu(
     };
 
     const text = inputSelection.getAsString();
+    console.log(`readyForContextMenu text`, text);
     if (text.length === 0) {
       getMenuItemButton("切り取り").disabled = true;
       getMenuItemButton("コピー").disabled = true;
