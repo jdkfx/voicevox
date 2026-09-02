@@ -1,6 +1,6 @@
 import { test, expect, type Locator } from "@playwright/test";
 
-import { gotoHome, navigateToMain } from "../navigators";
+import { gotoHome, navigateToTalk } from "../navigators";
 import { fillAudioCell, validateInput } from "./utils";
 
 test.beforeEach(gotoHome);
@@ -17,7 +17,7 @@ async function getCenter(locator: Locator) {
 
 test("テキストの追加・入れ替え・削除", async ({ page }) => {
   // デフォルトでaudioCellは一つなのを確認
-  await navigateToMain(page);
+  await navigateToTalk(page);
   await expect(
     page.getByRole("button").filter({ hasText: "add" }),
   ).toBeVisible();
@@ -63,7 +63,7 @@ test("テキストの追加・入れ替え・削除", async ({ page }) => {
 test("選択中のAudioCellを削除しても正しくフォーカスが移動する", async ({
   page,
 }) => {
-  await navigateToMain(page);
+  await navigateToTalk(page);
 
   // 3つAudioCellを追加して合計4つにする
   await page.getByRole("button").filter({ hasText: "add" }).click();
