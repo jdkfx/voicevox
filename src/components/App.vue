@@ -1,11 +1,7 @@
 <template>
   <ErrorBoundary>
     <TooltipProvider disableHoverableContent :delayDuration="500">
-      <MenuBar
-        v-if="openedEditor != undefined"
-        :subMenuData
-        :editor="openedEditor"
-      />
+      <MenuBar :subMenuData :editor="openedEditor" />
       <KeepAlive>
         <Component
           :is="openedEditor == 'talk' ? TalkEditor : SingEditor"

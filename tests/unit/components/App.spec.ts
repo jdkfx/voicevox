@@ -1,4 +1,4 @@
-import { flushPromises, shallowMount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "@/components/App.vue";
 import type { EditorType } from "@/type/preload";
@@ -72,7 +72,10 @@ vi.mock("@/domain/dom", () => ({
 }));
 
 vi.mock("@/components/Menu/MenuBar/MenuBar.vue", () => ({
-  default: { template: "<div />" },
+  default: {
+    name: "MenuBar",
+    template: '<div data-testid="menu-bar" />',
+  },
 }));
 
 vi.mock("@/components/Talk/TalkEditor.vue", () => ({
@@ -89,6 +92,10 @@ vi.mock("@/components/Dialog/AllDialog.vue", () => ({
 
 vi.mock("@/components/ErrorBoundary.vue", () => ({
   default: { template: "<div><slot /></div>" },
+}));
+
+vi.mock("reka-ui", () => ({
+  TooltipProvider: { template: "<div><slot /></div>" },
 }));
 
 describe("App", () => {
@@ -120,7 +127,7 @@ describe("App", () => {
         store.state.openedEditor = openedEditor;
       });
 
-      shallowMount(App);
+      mount(App);
       await flushPromises();
 
       expect(store.actions.SET_DIALOG_OPEN).toHaveBeenCalledExactlyOnceWith({
@@ -130,4 +137,15 @@ describe("App", () => {
       });
     },
   );
+
+  it("エディタが未選択でもタイトルバーを表示する", async () => {
+    store.actions.INIT_VUEX.mockImplementationOnce(() => {
+      store.state.openedEditor = undefined;
+    });
+
+    const wrapper = mount(App);
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="menu-bar"]').exists()).toBe(true);
+  });
 });
