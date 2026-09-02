@@ -305,6 +305,14 @@ const migrations: [string, (store: Record<string, unknown>) => unknown][] = [
       config.hotkeySettings = newHotkeySettings;
     },
   ],
+  [
+    ">=0.27",
+    (config) => {
+      if (!Object.hasOwn(config, "openedEditor")) {
+        config.openedEditor = "talk";
+      }
+    },
+  ],
 ];
 
 export type Metadata = {
