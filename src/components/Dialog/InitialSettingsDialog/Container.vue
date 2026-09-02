@@ -12,10 +12,14 @@ defineOptions({
   name: "InitialSettingsDialog",
 });
 
+const props = defineProps<{
+  canOpenDialog: boolean;
+}>();
+
 const store = useStore();
 
 const isDialogOpen = computed({
-  get: () => store.state.isInitialSettingsDialogOpen,
+  get: () => props.canOpenDialog && store.state.isInitialSettingsDialogOpen,
   set: (value) =>
     store.actions.SET_DIALOG_OPEN({
       isInitialSettingsDialogOpen: value,

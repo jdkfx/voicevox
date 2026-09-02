@@ -22,6 +22,12 @@ vi.mock("@/store", () => ({
 }));
 
 const PresentationStub = defineComponent({
+  props: {
+    modelValue: {
+      type: Boolean,
+      required: true,
+    },
+  },
   emits: {
     select: (editor: EditorType) => editor === "talk" || editor === "song",
   },
@@ -45,6 +51,9 @@ describe("InitialSettingsDialog Container", () => {
     "$labelを選択すると設定を保存してダイアログを閉じる",
     async ({ editor }) => {
       const wrapper = mount(Container, {
+        props: {
+          canOpenDialog: true,
+        },
         global: {
           stubs: {
             Presentation: PresentationStub,
@@ -67,4 +76,21 @@ describe("InitialSettingsDialog Container", () => {
       );
     },
   );
+
+  it("表示を許可されるまではダイアログを表示しない", () => {
+    const wrapper = mount(Container, {
+      props: {
+        canOpenDialog: false,
+      },
+      global: {
+        stubs: {
+          Presentation: PresentationStub,
+        },
+      },
+    });
+
+    expect(wrapper.findComponent(PresentationStub).props("modelValue")).toBe(
+      false,
+    );
+  });
 });
