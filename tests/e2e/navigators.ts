@@ -9,7 +9,12 @@ export async function gotoHome({ page }: { page: Page }) {
   });
 }
 
-export async function navigateToEditorSelection(page: Page): Promise<Locator> {
+export async function navigateToEditorSelection(
+  page: Page,
+  {
+    shouldConfirmCharacterOrder = true,
+  }: { shouldConfirmCharacterOrder?: boolean } = {},
+): Promise<Locator> {
   await test.step("利用規約に同意する", async () => {
     await expect(page.getByText("利用規約に関するお知らせ")).toBeVisible({
       timeout: 90 * 1000,
@@ -17,11 +22,13 @@ export async function navigateToEditorSelection(page: Page): Promise<Locator> {
     await page.getByRole("button", { name: "同意して使用開始" }).click();
   });
 
-  await test.step("キャラクターの並び順を確定する", async () => {
-    const completeButton = page.getByRole("button", { name: "完了" });
-    await expect(completeButton).toBeVisible();
-    await completeButton.click();
-  });
+  if (shouldConfirmCharacterOrder) {
+    await test.step("キャラクターの並び順を確定する", async () => {
+      const completeButton = page.getByRole("button", { name: "完了" });
+      await expect(completeButton).toBeVisible();
+      await completeButton.click();
+    });
+  }
 
   await test.step("テレメトリーを許可する", async () => {
     const allowButton = page.getByRole("button", { name: "許可" });

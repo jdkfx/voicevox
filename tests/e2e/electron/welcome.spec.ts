@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import dotenv from "dotenv";
+import { navigateToEditorSelection } from "../navigators";
 import { expect, test } from "./fixtures";
 import { getUserTestDir } from "./helper";
 
@@ -102,20 +103,22 @@ test("Welcome画面でエンジンをアップデートできる", async ({
     };
   });
 
-  const welcomePage = await test.step("Welcome画面に移動する", async () => {
-    const mainPage = await app.firstWindow({
+  const mainPage = await test.step("エディタ画面を開く", async () => {
+    return await app.firstWindow({
       timeout: process.env.CI ? 90000 : 60000,
     });
+  });
 
-    await test.step("初期設定でトークを選択する", async () => {
-      const dialog = mainPage.getByRole("dialog", {
-        name: "どちらに興味がありますか？",
-      });
-      await dialog.waitFor({ timeout: 60000 });
-      await dialog.getByRole("button", { name: "トーク" }).click();
-      await expect(dialog).toBeHidden();
-    });
+  const dialog = await navigateToEditorSelection(mainPage, {
+    shouldConfirmCharacterOrder: false,
+  });
 
+  await test.step("トークを選択する", async () => {
+    await dialog.getByRole("button", { name: "トーク" }).click();
+    await expect(dialog).toBeHidden();
+  });
+
+  const welcomePage = await test.step("Welcome画面に移動する", async () => {
     const engineMenu = mainPage.getByText("エンジン", { exact: true });
     await engineMenu.waitFor({
       timeout: 60000,
