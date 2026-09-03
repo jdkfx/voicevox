@@ -107,6 +107,15 @@ test("Welcome画面でエンジンをアップデートできる", async ({
       timeout: process.env.CI ? 90000 : 60000,
     });
 
+    await test.step("初期設定でトークを選択する", async () => {
+      const dialog = mainPage.getByRole("dialog", {
+        name: "どちらに興味がありますか？",
+      });
+      await dialog.waitFor({ timeout: 60000 });
+      await dialog.getByRole("button", { name: "トーク" }).click();
+      await expect(dialog).toBeHidden();
+    });
+
     const engineMenu = mainPage.getByText("エンジン", { exact: true });
     await engineMenu.waitFor({
       timeout: 60000,
