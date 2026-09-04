@@ -6,6 +6,7 @@
           flat
           label="キャンセル"
           color="display"
+          :disable="uiLocked"
           @click="dialogOpened = false"
         />
       </QCardActions>
@@ -26,7 +27,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { lockUiWhile } from "./common";
+import { lockUiWhile, uiLocked } from "./common";
 import WordEditor from "./WordEditor.vue";
 import { useStore } from "@/store";
 import { UnreachableError } from "@/type/utility";
