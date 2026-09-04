@@ -1,9 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import dotenv from "dotenv";
-import { navigateToEditorSelection } from "../navigators";
 import { expect, test } from "./fixtures";
-import { getUserTestDir } from "./helper";
+import { getUserTestDir, prepareCompletedInitialSettings } from "./helper";
 
 const defaultEngineId = "208cf94d-43d2-4cf5-abc0-9783cac36d29";
 const oldEngineDirName = `VOICEVOX_Nemo_Engine+${defaultEngineId}`;
@@ -86,6 +85,10 @@ test("Welcome画面でエンジンをアップデートできる", async ({
     await installOldEngine();
   });
 
+  await test.step("初期設定を完了済みにする", async () => {
+    await prepareCompletedInitialSettings();
+  });
+
   const app = await launchElectronApp();
 
   // ダミーエンジンは起動できずに異常終了するため、エラーダイアログが表示される。
@@ -107,15 +110,6 @@ test("Welcome画面でエンジンをアップデートできる", async ({
     return await app.firstWindow({
       timeout: process.env.CI ? 90000 : 60000,
     });
-  });
-
-  const dialog = await navigateToEditorSelection(mainPage, {
-    shouldConfirmCharacterOrder: false,
-  });
-
-  await test.step("トークを選択する", async () => {
-    await dialog.getByRole("button", { name: "トーク" }).click();
-    await expect(dialog).toBeHidden();
   });
 
   const welcomePage = await test.step("Welcome画面に移動する", async () => {
@@ -165,7 +159,7 @@ test("Welcome画面でエンジンをアップデートできる", async ({
     const editorPage = await app.waitForEvent("window", {
       timeout: process.env.CI ? 90000 : 60000,
     });
-    await editorPage.waitForSelector("text=利用規約に関するお知らせ", {
+    await editorPage.getByText("エンジン", { exact: true }).waitFor({
       timeout: 60000,
     });
   });
