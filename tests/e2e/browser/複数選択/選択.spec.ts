@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { navigateToMain, gotoHome } from "../../navigators";
+import { getQuasarMenu } from "../../locators";
 import { collectAllAudioCellContents, fillAudioCell } from "../utils";
 import { ctrlLike, addAudioCells } from "./utils";
 
@@ -230,6 +231,82 @@ test("複数選択したAudioCellをDeleteキーで削除できる", async ({ pa
     await expect(page.locator(".audio-cell")).toHaveCount(2);
     expect(await collectAllAudioCellContents(page)).toEqual([
       "一つ目のセルは削除されません。",
+      "四つ目のセルは削除されません。",
+    ]);
+  });
+});
+
+test("テキスト入力中のDeleteキーではAudioCellを削除しない", async ({
+  page,
+}) => {
+  const textField = page.getByRole("textbox", { name: "1行目" });
+
+  await test.step("テキストを入力する", async () => {
+    await textField.fill("テストです");
+  });
+
+  await test.step("入力中にDeleteキーで一文字を削除する", async () => {
+    await textField.press("Home");
+    await textField.press("ArrowRight");
+    await textField.press("Delete");
+  });
+
+  await test.step("AudioCellを維持してテキストだけを変更する", async () => {
+    await expect(page.locator(".audio-cell")).toHaveCount(4);
+    await expect(textField).toHaveValue("テトです");
+  });
+});
+
+test("単独選択したAudioCellをDeleteキーで削除しない", async ({ page }) => {
+  const audioCell = page.locator(".audio-cell").nth(1);
+
+  await test.step("AudioCellを単独選択してrootにフォーカスする", async () => {
+    await audioCell.click();
+    await audioCell.focus();
+    await expect(audioCell).toHaveClass(/active/);
+    await expect(page.locator(".audio-cell.selected")).toHaveCount(1);
+  });
+
+  await test.step("Deleteキーを押す", async () => {
+    await page.keyboard.press("Delete");
+  });
+
+  await test.step("AudioCellを維持する", async () => {
+    await expect(page.locator(".audio-cell")).toHaveCount(4);
+  });
+});
+
+test("複数削除を一回のUndoで復元できる", async ({ page }) => {
+  await test.step("各AudioCellにテキストを入力する", async () => {
+    await fillAudioCell(page, 0, "一つ目のセルは削除されません。");
+    await fillAudioCell(page, 1, "二つ目のセルは削除されます。");
+    await fillAudioCell(page, 2, "三つ目のセルは削除されます。");
+    await fillAudioCell(page, 3, "四つ目のセルは削除されません。");
+  });
+
+  await test.step("中央のAudioCellを複数選択する", async () => {
+    await page.locator(".audio-cell:nth-child(2)").click();
+    await page.keyboard.down("Shift");
+    await page.locator(".audio-cell:nth-child(3)").click();
+    await page.keyboard.up("Shift");
+  });
+
+  await test.step("Deleteキーで選択したAudioCellを削除する", async () => {
+    await page.keyboard.press("Delete");
+    await expect(page.locator(".audio-cell")).toHaveCount(2);
+  });
+
+  await test.step("元に戻す操作で削除前のAudioCellを復元する", async () => {
+    await page.getByRole("button", { name: "編集" }).click();
+    await getQuasarMenu(page, "元に戻す").click();
+  });
+
+  await test.step("全てのAudioCellを復元する", async () => {
+    await expect(page.locator(".audio-cell")).toHaveCount(4);
+    expect(await collectAllAudioCellContents(page)).toEqual([
+      "一つ目のセルは削除されません。",
+      "二つ目のセルは削除されます。",
+      "三つ目のセルは削除されます。",
       "四つ目のセルは削除されません。",
     ]);
   });
