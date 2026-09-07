@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { navigateToMain, gotoHome } from "../../navigators";
+import { collectAllAudioCellContents, fillAudioCell } from "../utils";
 import { ctrlLike, addAudioCells } from "./utils";
 
 test.beforeEach(async ({ page }) => {
@@ -203,6 +204,35 @@ test("複数選択：キーボード", async ({ page }) => {
   selectedStatus = await getSelectedStatus(page);
   expect(selectedStatus.active).toBe(3);
   expect(selectedStatus.selected).toEqual([3]);
+});
+
+test("複数選択したAudioCellをDeleteキーで削除できる", async ({ page }) => {
+  await test.step("各AudioCellにテキストを入力する", async () => {
+    await fillAudioCell(page, 0, "一つ目のセルは削除されません。");
+    await fillAudioCell(page, 1, "二つ目のセルは削除されます。");
+    await fillAudioCell(page, 2, "三つ目のセルは削除されます。");
+    await fillAudioCell(page, 3, "四つ目のセルは削除されません。");
+  });
+
+  await test.step("中央のAudioCellを複数選択する", async () => {
+    await page.locator(".audio-cell:nth-child(2)").click();
+    await page.keyboard.down("Shift");
+    await page.locator(".audio-cell:nth-child(3)").click();
+    await page.keyboard.up("Shift");
+    await expect(page.locator(".audio-cell.selected")).toHaveCount(2);
+  });
+
+  await test.step("Deleteキーで選択したAudioCellを削除する", async () => {
+    await page.keyboard.press("Delete");
+  });
+
+  await test.step("選択していないAudioCellだけが残る", async () => {
+    await expect(page.locator(".audio-cell")).toHaveCount(2);
+    expect(await collectAllAudioCellContents(page)).toEqual([
+      "一つ目のセルは削除されません。",
+      "四つ目のセルは削除されません。",
+    ]);
+  });
 });
 
 test("複数選択：台本欄の余白クリックで解除", async ({ page }) => {
