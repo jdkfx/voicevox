@@ -21,6 +21,7 @@ export const hotkeyActionNameSchema = z.enum([
   "テキスト欄を追加",
   "テキスト欄を複製",
   "テキスト欄を削除",
+  "選択中のテキスト欄を削除",
   "テキスト欄からフォーカスを外す",
   "テキスト欄にフォーカスを戻す",
   "元に戻す",
@@ -111,6 +112,10 @@ export function getDefaultHotkeySettings({
     {
       action: "テキスト欄を削除",
       combination: HotkeyCombination("Shift Delete"),
+    },
+    {
+      action: "選択中のテキスト欄を削除",
+      combination: HotkeyCombination("Delete"),
     },
     {
       action: "テキスト欄からフォーカスを外す",

@@ -266,6 +266,19 @@ registerHotkeyWithCleanup({
 });
 registerHotkeyWithCleanup({
   editor: "talk",
+  name: "選択中のテキスト欄を削除",
+  callback: () => {
+    if (
+      !uiLocked.value &&
+      isMultiSelectEnabled.value &&
+      selectedAudioKeys.value.length >= 2
+    ) {
+      void removeAudioItem();
+    }
+  },
+});
+registerHotkeyWithCleanup({
+  editor: "talk",
   enableInTextbox: true,
   name: "テキスト欄からフォーカスを外す",
   callback: () => {
