@@ -79,6 +79,10 @@ exports[`0.13.0からマイグレーションできる 1`] = `
       "combination": "Shift Delete",
     },
     {
+      "action": "選択中のテキスト欄を削除",
+      "combination": "Delete",
+    },
+    {
       "action": "テキスト欄からフォーカスを外す",
       "combination": "Escape",
     },
